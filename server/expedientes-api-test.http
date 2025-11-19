@@ -1,0 +1,265 @@
+### ================================================
+### API Testing - Módulo de Expedientes
+### Base URL: http://localhost:3000/api
+### ================================================
+
+@baseUrl = http://localhost:3000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkIxM0YzQjBGLTQ4MTgtNDlFNy05MDBDLUUxMTYyRTg1ODJDNCIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1OTQ3NDQsImV4cCI6MTc2MzY4MTE0NH0.v84M1danfInpMq_Y4ZzmQW7yQ69hSiAnUa1BUYxzOB0
+
+### ================================================
+### AUTENTICACIÓN (para obtener el token)
+### ================================================
+
+### Login - Obtener Token
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@example.com",
+  "password": "admin123"
+}
+
+### ================================================
+### EXPEDIENTES
+### ================================================
+
+### 1. Crear Expediente
+POST {{baseUrl}}/expedientes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "numeroExpediente": "EXP-2025-001",
+  "descripcion": "Expediente de prueba para caso de robo"
+}
+
+### 2. Obtener Todos los Expedientes
+GET {{baseUrl}}/expedientes
+Authorization: Bearer {{token}}
+
+### 3. Obtener Expediente por ID
+GET {{baseUrl}}/expedientes/AQUI_VA_EL_ID
+Authorization: Bearer {{token}}
+
+### 4. Actualizar Expediente
+PUT {{baseUrl}}/expedientes/AQUI_VA_EL_ID
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "descripcion": "Expediente actualizado con nueva información"
+}
+
+### 5. Enviar Expediente a Revisión
+POST {{baseUrl}}/expedientes/CA925E16-1098-4AF9-B115-FB792B378554/revision
+Authorization: Bearer {{token}}
+
+### 6. Eliminar Expediente (solo BORRADOR)
+DELETE {{baseUrl}}/expedientes/AQUI_VA_EL_ID
+Authorization: Bearer {{token}}
+
+### ================================================
+### INDICIOS
+### ================================================
+
+### 7. Crear Indicio
+POST {{baseUrl}}/indicios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "expedienteId": "CA925E16-1098-4AF9-B115-FB792B378554",
+  "numeroIndicio": "IND-001",
+  "descripcion": "Arma blanca tipo cuchillo",
+  "color": "Plateado",
+  "tamano": "20 cm de longitud",
+  "peso": 0.15,
+  "ubicacion": "Encontrado en la escena del crimen, coordenadas GPS",
+  "observaciones": "Presenta manchas de sangre"
+}
+
+### 8. Crear Otro Indicio
+POST {{baseUrl}}/indicios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "expedienteId": "CA925E16-1098-4AF9-B115-FB792B378554",
+  "numeroIndicio": "IND-002",
+  "descripcion": "Huella dactilar",
+  "color": "N/A",
+  "tamano": "Tamaño completo",
+  "ubicacion": "Puerta principal",
+  "observaciones": "Huella clara y completa"
+}
+
+### 9. Obtener Indicios de un Expediente
+GET {{baseUrl}}/indicios/expediente/CA925E16-1098-4AF9-B115-FB792B378554
+Authorization: Bearer {{token}}
+
+### 10. Actualizar Indicio
+PUT {{baseUrl}}/indicios/AQUI_VA_EL_ID_DEL_INDICIO
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "descripcion": "Arma blanca tipo cuchillo - actualizado",
+  "color": "Plateado con mango negro",
+  "observaciones": "Presenta manchas de sangre tipo O+"
+}
+
+### 11. Eliminar Indicio (solo en expedientes BORRADOR)
+DELETE {{baseUrl}}/indicios/AQUI_VA_EL_ID_DEL_INDICIO
+Authorization: Bearer {{token}}
+
+### ================================================
+### REVISIONES (Solo ADMIN y MODERADOR)
+### ================================================
+
+### 12. Aprobar Expediente
+POST {{baseUrl}}/revisiones/CA925E16-1098-4AF9-B115-FB792B378554/aprobar
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "comentarios": "Expediente aprobado, toda la documentación está en orden"
+}
+
+### 13. Rechazar Expediente
+POST {{baseUrl}}/revisiones/AQUI_VA_EL_ID_DEL_EXPEDIENTE/rechazar
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "comentarios": "Falta información en el indicio IND-001, favor de completar"
+}
+
+### 14. Obtener Historial de Revisiones
+GET {{baseUrl}}/revisiones/CA925E16-1098-4AF9-B115-FB792B378554/historial
+Authorization: Bearer {{token}}
+
+### ================================================
+### FLUJO COMPLETO DE PRUEBA
+### ================================================
+
+### PASO 1: Login como USER
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "correo": "user@test.com",
+  "password": "user123"
+}
+
+### PASO 2: Crear Expediente (USER)
+# @name crearExpediente
+POST {{baseUrl}}/expedientes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "numeroExpediente": "EXP-2025-100",
+  "descripcion": "Caso de asalto en tienda comercial"
+}
+
+### PASO 3: Agregar Primer Indicio
+POST {{baseUrl}}/indicios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "expedienteId": "{{crearExpediente.response.body.data.expediente.id}}",
+  "numeroIndicio": "IND-001",
+  "descripcion": "Video de seguridad",
+  "ubicacion": "Cámara 1 - Entrada principal",
+  "observaciones": "Muestra claramente al sospechoso"
+}
+
+### PASO 4: Agregar Segundo Indicio
+POST {{baseUrl}}/indicios
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "expedienteId": "{{crearExpediente.response.body.data.expediente.id}}",
+  "numeroIndicio": "IND-002",
+  "descripcion": "Billetera abandonada",
+  "color": "Negro",
+  "tamano": "10x8 cm",
+  "ubicacion": "Encontrada en el piso de la tienda"
+}
+
+### PASO 5: Enviar a Revisión (USER)
+POST {{baseUrl}}/expedientes/{{crearExpediente.response.body.data.expediente.id}}/revision
+Authorization: Bearer {{token}}
+
+### PASO 6: Login como ADMIN/MODERADOR
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@test.com",
+  "password": "admin123"
+}
+
+### PASO 7: Ver Expedientes en Revisión (ADMIN)
+GET {{baseUrl}}/expedientes
+Authorization: Bearer {{token}}
+
+### PASO 8: Aprobar Expediente (ADMIN)
+POST {{baseUrl}}/revisiones/{{crearExpediente.response.body.data.expediente.id}}/aprobar
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "comentarios": "Todo correcto, expediente aprobado"
+}
+
+### PASO 9: Ver Historial de Revisiones
+GET {{baseUrl}}/revisiones/{{crearExpediente.response.body.data.expediente.id}}/historial
+Authorization: Bearer {{token}}
+
+### ================================================
+### CASOS DE ERROR (para validar)
+### ================================================
+
+### Error 1: Crear expediente con número duplicado
+POST {{baseUrl}}/expedientes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "numeroExpediente": "EXP-2025-001",
+  "descripcion": "Esto debería fallar"
+}
+
+### Error 2: Enviar a revisión sin indicios
+POST {{baseUrl}}/expedientes/EXPEDIENTE_SIN_INDICIOS/revision
+Authorization: Bearer {{token}}
+
+### Error 3: Rechazar sin comentarios (debería fallar)
+POST {{baseUrl}}/revisiones/AQUI_VA_EL_ID/rechazar
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "comentarios": ""
+}
+
+### Error 4: USER intenta aprobar (no tiene permiso)
+POST {{baseUrl}}/revisiones/AQUI_VA_EL_ID/aprobar
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "comentarios": "Intento de aprobación"
+}
+
+### Error 5: Editar expediente en estado APROBADO
+PUT {{baseUrl}}/expedientes/EXPEDIENTE_APROBADO_ID
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "descripcion": "Esto debería fallar"
+}
