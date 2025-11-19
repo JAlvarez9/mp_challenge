@@ -1,0 +1,96 @@
+### REGISTRO DE USUARIO
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Administrador",
+  "correo": "admin@example.com",
+  "password": "admin123",
+  "rol": "ADMIN"
+}
+
+###
+
+### LOGIN
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@example.com",
+  "password": "admin123"
+}
+
+###
+
+### OBTENER USUARIO ACTUAL (Requiere token)
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+###
+
+### LISTAR USUARIOS (Requiere token y rol ADMIN/MODERADOR)
+GET http://localhost:3000/api/usuarios
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+###
+
+### OBTENER USUARIO POR ID
+GET http://localhost:3000/api/usuarios/0EFA423E-F36B-1410-8696-00160A737F56
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+###
+
+### CREAR USUARIO (Requiere token y rol ADMIN)
+POST http://localhost:3000/api/usuarios
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+{
+  "nombre": "Nuevo Usuario",
+  "correo": "nuevo@example.com",
+  "password": "password123",
+  "rol": "USER"
+}
+
+###
+
+### ACTUALIZAR USUARIO (Requiere token y rol ADMIN)
+PUT http://localhost:3000/api/usuarios/USER_ID_HERE
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+{
+  "nombre": "Usuario Actualizado",
+  "rol": "MODERADOR"
+}
+
+###
+
+### CAMBIAR CONTRASEÑA
+PUT http://localhost:3000/api/usuarios/USER_ID_HERE/cambiar-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+{
+  "passwordActual": "password123",
+  "passwordNuevo": "newpassword456"
+}
+
+###
+
+### DESACTIVAR USUARIO (Requiere token y rol ADMIN)
+DELETE http://localhost:3000/api/usuarios/USER_ID_HERE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+###
+
+### ACTIVAR USUARIO (Requiere token y rol ADMIN)
+PUT http://localhost:3000/api/usuarios/USER_ID_HERE/activar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBFRkE0MjNFLUYzNkItMTQxMC04Njk2LTAwMTYwQTczN0Y1NiIsImNvcnJlbyI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3NjM1MDkyMDQsImV4cCI6MTc2MzU5NTYwNH0.6L5ttZmgr3ENswcd3X55OlVyJjvA7wnuFMdHYHM1-q0
+
+###
+
+### HEALTH CHECK
+GET http://localhost:3000/api/health
+
+###
