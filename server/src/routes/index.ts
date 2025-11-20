@@ -4,6 +4,7 @@ import usuarioRoutes from "./usuario.routes";
 import expedienteRoutes from "./expediente.routes";
 import indicioRoutes from "./indicio.routes";
 import revisionRoutes from "./revision.routes";
+import reportesRoutes from "./reportes.routes";
 
 const router = Router();
 
@@ -25,6 +26,9 @@ router.use("/indicios", indicioRoutes);
 
 // Rutas de revisiones
 router.use("/revisiones", revisionRoutes);
+
+// Rutas de reportes (solo ADMIN)
+router.use("/reportes", reportesRoutes);
 
 // Ruta de verificación de salud del API
 router.get("/health", (req, res) => {
