@@ -69,12 +69,21 @@ export default function NuevoExpedientePage() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => navigate("/expedientes")}
-            className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
-          >
-            ← Volver a mis expedientes
-          </button>
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="text-blue-600 hover:text-blue-700 flex items-center gap-2"
+            >
+              ← Dashboard
+            </button>
+            <span className="text-gray-400">|</span>
+            <button
+              onClick={() => navigate("/expedientes")}
+              className="text-blue-600 hover:text-blue-700 flex items-center gap-2"
+            >
+              📄 Mis expedientes
+            </button>
+          </div>
           <h1 className="text-3xl font-bold text-gray-900">
             Nuevo Expediente DICRI
           </h1>

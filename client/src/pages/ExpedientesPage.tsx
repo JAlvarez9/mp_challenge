@@ -69,6 +69,12 @@ export default function ExpedientesPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
+          >
+            ← Volver al Dashboard
+          </button>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">

@@ -211,12 +211,21 @@ export default function DetalleExpedientePage() {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <button
-            onClick={() => navigate("/expedientes")}
-            className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
-          >
-            ← Volver a mis expedientes
-          </button>
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="text-blue-600 hover:text-blue-700 flex items-center gap-2"
+            >
+              ← Dashboard
+            </button>
+            <span className="text-gray-400">|</span>
+            <button
+              onClick={() => navigate("/expedientes")}
+              className="text-blue-600 hover:text-blue-700 flex items-center gap-2"
+            >
+              📄 Mis expedientes
+            </button>
+          </div>
 
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
