@@ -3,6 +3,9 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import UsuariosPage from './pages/UsuariosPage';
 import UsuarioFormPage from './pages/UsuarioFormPage';
+import ExpedientesPage from './pages/ExpedientesPage';
+import NuevoExpedientePage from './pages/NuevoExpedientePage';
+import DetalleExpedientePage from './pages/DetalleExpedientePage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import RequireAuth from './components/RequireAuth';
 import { useAuthStore } from './store/authStore';
@@ -46,6 +49,30 @@ function App() {
           element={
             <RequireAuth>
               <UsuarioFormPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/expedientes"
+          element={
+            <RequireAuth>
+              <ExpedientesPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/expedientes/nuevo"
+          element={
+            <RequireAuth>
+              <NuevoExpedientePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/expedientes/:id"
+          element={
+            <RequireAuth>
+              <DetalleExpedientePage />
             </RequireAuth>
           }
         />

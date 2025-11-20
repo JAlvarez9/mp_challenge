@@ -64,8 +64,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-4">
                     Administra todos los expedientes del sistema
                   </p>
-                  <Button variant="outline" className="w-full" disabled>
-                    Próximamente
+                  <Button onClick={() => navigate('/expedientes')} className="w-full">
+                    Ver Expedientes
                   </Button>
                 </CardContent>
               </Card>
@@ -85,8 +85,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-4">
                     Crear y registrar un nuevo expediente
                   </p>
-                  <Button variant="outline" className="w-full" disabled>
-                    Próximamente
+                  <Button onClick={() => navigate('/expedientes/nuevo')} className="w-full">
+                    Crear Expediente
                   </Button>
                 </CardContent>
               </Card>
@@ -101,8 +101,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-4">
                     Ver solo los expedientes que has creado
                   </p>
-                  <Button variant="outline" className="w-full" disabled>
-                    Próximamente
+                  <Button onClick={() => navigate('/expedientes')} className="w-full">
+                    Ver Expedientes
                   </Button>
                 </CardContent>
               </Card>
@@ -122,8 +122,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-4">
                     Revisar y moderar expedientes
                   </p>
-                  <Button variant="outline" className="w-full" disabled>
-                    Próximamente
+                  <Button onClick={() => navigate('/expedientes')} className="w-full">
+                    Ver Expedientes
                   </Button>
                 </CardContent>
               </Card>
@@ -138,8 +138,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600 mb-4">
                     Crear un nuevo expediente
                   </p>
-                  <Button variant="outline" className="w-full" disabled>
-                    Próximamente
+                  <Button onClick={() => navigate('/expedientes/nuevo')} className="w-full">
+                    Crear Expediente
                   </Button>
                 </CardContent>
               </Card>
