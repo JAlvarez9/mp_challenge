@@ -44,6 +44,10 @@ export class IndicioService {
     return await this.indicioRepository.obtenerPorExpediente(expedienteId);
   }
 
+  async obtenerPorId(id: string): Promise<IIndicio | null> {
+    return await this.indicioRepository.obtenerPorId(id);
+  }
+
   async actualizar(
     id: string,
     descripcion: string | undefined,

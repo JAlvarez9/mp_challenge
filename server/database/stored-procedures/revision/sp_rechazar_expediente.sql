@@ -32,10 +32,10 @@ BEGIN
             THROW 50305, 'Debe proporcionar comentarios al rechazar un expediente', 1;
         END
         
-        -- Actualizar el expediente (vuelve a BORRADOR para correcciones)
+        -- Actualizar el expediente a RECHAZADO
         UPDATE Expedientes
         SET 
-            estado = 'BORRADOR',
+            estado = 'RECHAZADO',
             coordinadorId = @coordinadorId,
             fechaRevision = @now,
             comentariosRevision = @comentarios,

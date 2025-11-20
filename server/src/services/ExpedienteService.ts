@@ -92,4 +92,18 @@ export class ExpedienteService {
     // USER solo accede a sus propios expedientes
     return expediente.usuarioRegistroId === usuarioId;
   }
+
+  async verificarEsCreador(
+    expedienteId: string,
+    usuarioId: string
+  ): Promise<boolean> {
+    const expediente = await this.obtenerPorId(expedienteId);
+
+    if (!expediente) {
+      return false;
+    }
+
+    // Solo el usuario que registró el expediente puede editarlo
+    return expediente.usuarioRegistroId === usuarioId;
+  }
 }

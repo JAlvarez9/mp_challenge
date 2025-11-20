@@ -16,10 +16,10 @@ BEGIN
             THROW 50102, 'Expediente no encontrado', 1;
         END
         
-        -- Verificar que el expediente esté en BORRADOR
-        IF NOT EXISTS (SELECT 1 FROM Expedientes WHERE id = @id AND estado = 'BORRADOR')
+        -- Verificar que el expediente esté en BORRADOR o RECHAZADO
+        IF NOT EXISTS (SELECT 1 FROM Expedientes WHERE id = @id AND estado IN ('BORRADOR', 'RECHAZADO'))
         BEGIN
-            THROW 50103, 'Solo se pueden editar expedientes en estado BORRADOR', 1;
+            THROW 50103, 'Solo se pueden editar expedientes en estado BORRADOR o RECHAZADO', 1;
         END
         
         UPDATE Expedientes

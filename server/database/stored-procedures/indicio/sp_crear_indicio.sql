@@ -27,10 +27,10 @@ BEGIN
             THROW 50201, 'Expediente no encontrado', 1;
         END
         
-        -- Verificar que el expediente esté en BORRADOR
-        IF NOT EXISTS (SELECT 1 FROM Expedientes WHERE id = @expedienteId AND estado = 'BORRADOR')
+        -- Verificar que el expediente esté en BORRADOR o RECHAZADO
+        IF NOT EXISTS (SELECT 1 FROM Expedientes WHERE id = @expedienteId AND estado IN ('BORRADOR', 'RECHAZADO'))
         BEGIN
-            THROW 50202, 'Solo se pueden agregar indicios a expedientes en estado BORRADOR', 1;
+            THROW 50202, 'Solo se pueden agregar indicios a expedientes en estado BORRADOR o RECHAZADO', 1;
         END
         
         -- Verificar que el número de indicio no se repita en el mismo expediente

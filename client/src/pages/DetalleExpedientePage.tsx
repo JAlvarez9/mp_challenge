@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 import { expedienteService } from "../services/expedienteService";
 import { indicioService } from "../services/indicioService";
+import { revisionService } from "../services/revisionService";
 import type {
   IExpediente,
   IIndicio,
@@ -20,6 +22,7 @@ export default function DetalleExpedientePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuthStore();
 
   const [expediente, setExpediente] = useState<IExpediente | null>(null);
   const [indicios, setIndicios] = useState<IIndicio[]>([]);
@@ -35,6 +38,14 @@ export default function DetalleExpedientePage() {
   const [mensaje, setMensaje] = useState<string | null>(
     location.state?.mensaje || null
   );
+
+  // Modal de rechazo
+  const [mostrarModalRechazo, setMostrarModalRechazo] = useState(false);
+  const [comentariosRechazo, setComentariosRechazo] = useState("");
+
+  // Modal de aprobación
+  const [mostrarModalAprobacion, setMostrarModalAprobacion] = useState(false);
+  const [comentariosAprobacion, setComentariosAprobacion] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -70,9 +81,13 @@ export default function DetalleExpedientePage() {
     }
   };
 
+  // Solo el creador puede editar el expediente
+  const esCreador = expediente?.usuarioRegistroId === user?.id;
+  const esCoordinador = user?.rol === "ADMIN" || user?.rol === "MODERADOR";
   const puedeEditar =
-    expediente?.estado === "BORRADOR" || expediente?.estado === "RECHAZADO";
-  const puedeEnviarRevision = expediente?.estado === "BORRADOR" && indicios.length > 0;
+    esCreador && (expediente?.estado === "BORRADOR" || expediente?.estado === "RECHAZADO");
+  const puedeEnviarRevision = esCreador && (expediente?.estado === "BORRADOR" || expediente?.estado === "RECHAZADO") && indicios.length > 0;
+  const puedeRevisar = esCoordinador && expediente?.estado === "EN_REVISION";
 
   // Actualizar expediente
   const handleActualizarExpediente = async (data: ActualizarExpedienteDTO) => {
@@ -137,11 +152,12 @@ export default function DetalleExpedientePage() {
   const handleEnviarRevision = async () => {
     if (!puedeEnviarRevision) return;
 
-    if (
-      !window.confirm(
-        "¿Estás seguro de enviar este expediente a revisión? No podrás modificarlo hasta que sea revisado."
-      )
-    ) {
+    const esReenvio = expediente?.estado === "RECHAZADO";
+    const mensaje = esReenvio
+      ? "¿Estás seguro de reenviar este expediente a revisión? Has realizado las correcciones solicitadas."
+      : "¿Estás seguro de enviar este expediente a revisión? No podrás modificarlo hasta que sea revisado.";
+
+    if (!window.confirm(mensaje)) {
       return;
     }
 
@@ -149,9 +165,64 @@ export default function DetalleExpedientePage() {
       setIsSubmitting(true);
       const response = await expedienteService.enviarARevision(id!);
       setExpediente(response.data.expediente);
-      setMensaje("Expediente enviado a revisión exitosamente");
+      setMensaje(
+        esReenvio
+          ? "✅ Expediente reenviado a revisión exitosamente"
+          : "📤 Expediente enviado a revisión exitosamente"
+      );
     } catch (err: any) {
       alert(err.response?.data?.message || "Error al enviar a revisión");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Aprobar expediente
+  const handleAprobar = async () => {
+    if (!puedeRevisar) return;
+    setMostrarModalAprobacion(true);
+  };
+
+  const confirmarAprobacion = async () => {
+    try {
+      setIsSubmitting(true);
+      const response = await revisionService.aprobar(id!, { 
+        comentarios: comentariosAprobacion.trim() || undefined 
+      });
+      setExpediente(response.data.expediente);
+      setMensaje("✅ Expediente aprobado exitosamente");
+      setMostrarModalAprobacion(false);
+      setComentariosAprobacion("");
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Error al aprobar expediente");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Rechazar expediente
+  const handleRechazar = async () => {
+    if (!puedeRevisar) return;
+    setMostrarModalRechazo(true);
+  };
+
+  const confirmarRechazo = async () => {
+    if (!comentariosRechazo.trim()) {
+      alert("Los comentarios son obligatorios al rechazar un expediente");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const response = await revisionService.rechazar(id!, {
+        comentarios: comentariosRechazo,
+      });
+      setExpediente(response.data.expediente);
+      setMensaje("❌ Expediente rechazado. El creador puede realizar correcciones.");
+      setMostrarModalRechazo(false);
+      setComentariosRechazo("");
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Error al rechazar expediente");
     } finally {
       setIsSubmitting(false);
     }
@@ -248,6 +319,27 @@ export default function DetalleExpedientePage() {
           </div>
         )}
 
+        {/* Mensaje informativo cuando no es el creador */}
+        {!esCreador && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-blue-500 text-xl">ℹ️</span>
+              <div className="flex-1">
+                <p className="text-blue-800">
+                  <strong>Vista de solo lectura</strong>
+                </p>
+                <p className="text-sm text-blue-700 mt-1">
+                  Este expediente fue creado por {expediente.usuarioRegistroNombre || 'otro usuario'}. 
+                  Solo el creador puede editarlo o modificar sus indicios.
+                  {user?.rol === 'ADMIN' || user?.rol === 'MODERADOR' 
+                    ? ' Como coordinador, puedes aprobarlo o rechazarlo desde la sección de revisión.' 
+                    : ''}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Comentarios de rechazo */}
         {expediente.estado === "RECHAZADO" && expediente.comentariosRevision && (
           <Card className="bg-red-50 border-red-200">
@@ -338,8 +430,8 @@ export default function DetalleExpedientePage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="text-sm text-gray-600">
               {puedeEnviarRevision ? (
-                <p>✅ Listo para enviar a revisión</p>
-              ) : expediente.estado === "BORRADOR" ? (
+                <p>✅ Listo para {expediente.estado === "RECHAZADO" ? "reenviar" : "enviar"} a revisión</p>
+              ) : (expediente.estado === "BORRADOR" || expediente.estado === "RECHAZADO") ? (
                 <p>⚠️ Agrega al menos 1 indicio para enviar a revisión</p>
               ) : (
                 <p>Estado: {expediente.estado}</p>
@@ -347,7 +439,7 @@ export default function DetalleExpedientePage() {
             </div>
 
             <div className="flex items-center gap-3">
-              {expediente.estado === "BORRADOR" && (
+              {puedeEditar && expediente.estado === "BORRADOR" && (
                 <Button variant="danger" onClick={handleEliminarExpediente}>
                   🗑️ Eliminar Expediente
                 </Button>
@@ -355,12 +447,110 @@ export default function DetalleExpedientePage() {
 
               {puedeEnviarRevision && (
                 <Button onClick={handleEnviarRevision} disabled={isSubmitting}>
-                  {isSubmitting ? "Enviando..." : "📤 Enviar a Revisión"}
+                  {isSubmitting 
+                    ? "Enviando..." 
+                    : expediente.estado === "RECHAZADO" 
+                      ? "📤 Reenviar a Revisión" 
+                      : "📤 Enviar a Revisión"}
                 </Button>
+              )}
+
+              {puedeRevisar && (
+                <>
+                  <Button
+                    variant="danger"
+                    onClick={handleRechazar}
+                    disabled={isSubmitting}
+                  >
+                    ❌ Rechazar
+                  </Button>
+                  <Button onClick={handleAprobar} disabled={isSubmitting}>
+                    {isSubmitting ? "Aprobando..." : "✅ Aprobar"}
+                  </Button>
+                </>
               )}
             </div>
           </div>
         </Card>
+
+        {/* Modal de Rechazo */}
+        {mostrarModalRechazo && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="max-w-lg w-full">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                ❌ Rechazar Expediente
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Por favor indica las razones del rechazo. El creador podrá ver estos
+                comentarios y realizar las correcciones necesarias.
+              </p>
+              <textarea
+                value={comentariosRechazo}
+                onChange={(e) => setComentariosRechazo(e.target.value)}
+                placeholder="Escribe los comentarios de rechazo..."
+                className="w-full border border-gray-300 rounded-lg p-3 min-h-[120px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+              <div className="flex items-center justify-end gap-3 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setMostrarModalRechazo(false);
+                    setComentariosRechazo("");
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={confirmarRechazo}
+                  disabled={isSubmitting || !comentariosRechazo.trim()}
+                >
+                  {isSubmitting ? "Rechazando..." : "Confirmar Rechazo"}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Modal de Aprobación */}
+        {mostrarModalAprobacion && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="max-w-lg w-full">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                ✅ Aprobar Expediente
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Puedes agregar comentarios adicionales sobre la aprobación (opcional).
+              </p>
+              <textarea
+                value={comentariosAprobacion}
+                onChange={(e) => setComentariosAprobacion(e.target.value)}
+                placeholder="Comentarios de aprobación (opcional)..."
+                className="w-full border border-gray-300 rounded-lg p-3 min-h-[120px] focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+              <div className="flex items-center justify-end gap-3 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setMostrarModalAprobacion(false);
+                    setComentariosAprobacion("");
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={confirmarAprobacion}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Aprobando..." : "Confirmar Aprobación"}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

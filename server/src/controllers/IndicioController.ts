@@ -34,16 +34,15 @@ export class IndicioController {
         });
       }
 
-      // Verificar acceso al expediente
-      const tieneAcceso = await this.expedienteService.verificarAcceso(
+      // Solo el creador puede agregar indicios
+      const esCreador = await this.expedienteService.verificarEsCreador(
         expedienteId,
-        usuarioId,
-        rolUsuario
+        usuarioId
       );
-      if (!tieneAcceso) {
+      if (!esCreador) {
         return res.status(403).json({
           success: false,
-          message: "No tiene permiso para agregar indicios a este expediente",
+          message: "Solo el creador del expediente puede agregar indicios",
         });
       }
 
@@ -123,12 +122,34 @@ export class IndicioController {
       const { id } = req.params;
       const { descripcion, color, tamano, peso, ubicacion, observaciones } =
         req.body;
+      const usuarioId = (req as any).user.id;
       const usuarioActual = (req as any).user.id;
 
       if (!id) {
         return res.status(400).json({
           success: false,
           message: "id es requerido",
+        });
+      }
+
+      // Obtener el indicio para verificar a qué expediente pertenece
+      const indicioActual = await this.indicioService.obtenerPorId(id);
+      if (!indicioActual) {
+        return res.status(404).json({
+          success: false,
+          message: "Indicio no encontrado",
+        });
+      }
+
+      // Solo el creador del expediente puede editar indicios
+      const esCreador = await this.expedienteService.verificarEsCreador(
+        indicioActual.expedienteId,
+        usuarioId
+      );
+      if (!esCreador) {
+        return res.status(403).json({
+          success: false,
+          message: "Solo el creador del expediente puede editar indicios",
         });
       }
 
@@ -160,12 +181,34 @@ export class IndicioController {
   eliminar = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const usuarioId = (req as any).user.id;
       const usuarioActual = (req as any).user.id;
 
       if (!id) {
         return res.status(400).json({
           success: false,
           message: "id es requerido",
+        });
+      }
+
+      // Obtener el indicio para verificar a qué expediente pertenece
+      const indicioActual = await this.indicioService.obtenerPorId(id);
+      if (!indicioActual) {
+        return res.status(404).json({
+          success: false,
+          message: "Indicio no encontrado",
+        });
+      }
+
+      // Solo el creador del expediente puede eliminar indicios
+      const esCreador = await this.expedienteService.verificarEsCreador(
+        indicioActual.expedienteId,
+        usuarioId
+      );
+      if (!esCreador) {
+        return res.status(403).json({
+          success: false,
+          message: "Solo el creador del expediente puede eliminar indicios",
         });
       }
 

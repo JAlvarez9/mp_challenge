@@ -90,6 +90,34 @@ export class IndicioRepository {
     return result.recordset;
   }
 
+  async obtenerPorId(id: string): Promise<IIndicio | null> {
+    const pool = await getPool();
+
+    const result = await pool.request().input("id", sql.UniqueIdentifier, id)
+      .query(`
+        SELECT 
+          i.id,
+          i.expedienteId,
+          i.numeroIndicio,
+          i.descripcion,
+          i.color,
+          i.tamano,
+          i.peso,
+          i.ubicacion,
+          i.observaciones,
+          i.usuarioRegistroId,
+          i.isActive,
+          i.createdAt,
+          i.updatedAt,
+          i.createdBy,
+          i.updatedBy
+        FROM Indicios i
+        WHERE i.id = @id AND i.isActive = 1
+      `);
+
+    return result.recordset.length > 0 ? result.recordset[0] : null;
+  }
+
   async actualizar(id: string, data: ActualizarIndicioDTO): Promise<IIndicio> {
     const pool = await getPool();
 

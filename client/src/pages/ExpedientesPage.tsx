@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 import { expedienteService } from "../services/expedienteService";
 import type { IExpediente } from "../types/expediente.types";
 import { ExpedienteCard } from "../components/expedientes/ExpedienteCard";
@@ -7,6 +8,7 @@ import { Button } from "../components/ui/Button";
 
 export default function ExpedientesPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [expedientes, setExpedientes] = useState<IExpediente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,10 +80,14 @@ export default function ExpedientesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Mis Expedientes
+                {user?.rol === 'ADMIN' || user?.rol === 'MODERADOR' 
+                  ? 'Todos los Expedientes' 
+                  : 'Mis Expedientes'}
               </h1>
               <p className="mt-2 text-gray-600">
-                Gestiona tus expedientes DICRI
+                {user?.rol === 'ADMIN' || user?.rol === 'MODERADOR'
+                  ? 'Revisa y gestiona todos los expedientes del sistema'
+                  : 'Gestiona tus expedientes DICRI'}
               </p>
             </div>
             <Button onClick={() => navigate("/expedientes/nuevo")}>
@@ -198,6 +204,7 @@ export default function ExpedientesPage() {
                 key={expediente.id}
                 expediente={expediente}
                 onDelete={handleDelete}
+                userId={user?.id}
               />
             ))}
           </div>

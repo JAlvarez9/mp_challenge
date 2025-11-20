@@ -26,10 +26,10 @@ BEGIN
         -- Obtener el expediente al que pertenece
         SELECT @expedienteId = expedienteId FROM Indicios WHERE id = @id;
         
-        -- Verificar que el expediente esté en BORRADOR
-        IF NOT EXISTS (SELECT 1 FROM Expedientes WHERE id = @expedienteId AND estado = 'BORRADOR')
+        -- Verificar que el expediente esté en BORRADOR o RECHAZADO
+        IF NOT EXISTS (SELECT 1 FROM Expedientes WHERE id = @expedienteId AND estado IN ('BORRADOR', 'RECHAZADO'))
         BEGIN
-            THROW 50205, 'Solo se pueden editar indicios de expedientes en estado BORRADOR', 1;
+            THROW 50205, 'Solo se pueden editar indicios de expedientes en estado BORRADOR o RECHAZADO', 1;
         END
         
         UPDATE Indicios

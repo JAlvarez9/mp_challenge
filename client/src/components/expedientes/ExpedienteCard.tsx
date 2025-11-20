@@ -7,9 +7,10 @@ import { Button } from "../ui/Button";
 interface ExpedienteCardProps {
   expediente: IExpediente;
   onDelete?: (id: string) => void;
+  userId?: string;
 }
 
-export function ExpedienteCard({ expediente, onDelete }: ExpedienteCardProps) {
+export function ExpedienteCard({ expediente, onDelete, userId }: ExpedienteCardProps) {
   const navigate = useNavigate();
 
   const formatFecha = (fecha: string) => {
@@ -20,8 +21,9 @@ export function ExpedienteCard({ expediente, onDelete }: ExpedienteCardProps) {
     });
   };
 
-  const puedeEliminar = expediente.estado === "BORRADOR";
-  const puedeEditar = expediente.estado === "BORRADOR" || expediente.estado === "RECHAZADO";
+  const esCreador = expediente.usuarioRegistroId === userId;
+  const puedeEliminar = esCreador && expediente.estado === "BORRADOR";
+  const puedeEditar = esCreador && (expediente.estado === "BORRADOR" || expediente.estado === "RECHAZADO");
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();

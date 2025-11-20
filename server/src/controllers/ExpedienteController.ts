@@ -130,16 +130,15 @@ export class ExpedienteController {
         });
       }
 
-      // Verificar acceso
-      const tieneAcceso = await this.expedienteService.verificarAcceso(
+      // Solo el creador puede editar el expediente
+      const esCreador = await this.expedienteService.verificarEsCreador(
         id,
-        usuarioId,
-        rolUsuario
+        usuarioId
       );
-      if (!tieneAcceso) {
+      if (!esCreador) {
         return res.status(403).json({
           success: false,
-          message: "No tiene permiso para modificar este expediente",
+          message: "Solo el creador del expediente puede editarlo",
         });
       }
 
@@ -177,16 +176,15 @@ export class ExpedienteController {
         });
       }
 
-      // Verificar acceso
-      const tieneAcceso = await this.expedienteService.verificarAcceso(
+      // Solo el creador puede enviar a revisión
+      const esCreador = await this.expedienteService.verificarEsCreador(
         id,
-        usuarioId,
-        rolUsuario
+        usuarioId
       );
-      if (!tieneAcceso) {
+      if (!esCreador) {
         return res.status(403).json({
           success: false,
-          message: "No tiene permiso para enviar este expediente a revisión",
+          message: "Solo el creador del expediente puede enviarlo a revisión",
         });
       }
 
