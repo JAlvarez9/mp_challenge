@@ -16,13 +16,7 @@ const indicioSchema = z.object({
     .max(500, "Máximo 500 caracteres"),
   color: z.string().max(50, "Máximo 50 caracteres").optional(),
   tamano: z.string().max(100, "Máximo 100 caracteres").optional(),
-  peso: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseFloat(val) : undefined))
-    .refine((val) => val === undefined || val > 0, {
-      message: "El peso debe ser mayor a 0",
-    }),
+  peso: z.string().optional(),
   ubicacion: z.string().max(255, "Máximo 255 caracteres").optional(),
   observaciones: z.string().max(1000, "Máximo 1000 caracteres").optional(),
 });
@@ -32,7 +26,7 @@ type IndicioFormData = z.infer<typeof indicioSchema>;
 interface IndicioFormProps {
   expedienteId: string;
   indicio?: IIndicio;
-  onSubmit: (data: CrearIndicioDTO | ActualizarIndicioDTO) => Promise<void>;
+  onSubmit: (data: any) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
 }
@@ -64,13 +58,24 @@ export function IndicioForm({
   });
 
   const handleFormSubmit = async (data: IndicioFormData) => {
+    // Transformar peso de string a number
+    const pesoNumerico = data.peso && data.peso.trim() !== "" 
+      ? parseFloat(data.peso) 
+      : undefined;
+
+    // Validar peso si existe
+    if (pesoNumerico !== undefined && (isNaN(pesoNumerico) || pesoNumerico <= 0)) {
+      alert("El peso debe ser un número mayor a 0");
+      return;
+    }
+
     if (indicio) {
       // Actualizar
       const updateData: ActualizarIndicioDTO = {
         descripcion: data.descripcion.trim(),
         color: data.color?.trim() || undefined,
         tamano: data.tamano?.trim() || undefined,
-        peso: data.peso,
+        peso: pesoNumerico,
         ubicacion: data.ubicacion?.trim() || undefined,
         observaciones: data.observaciones?.trim() || undefined,
       };
@@ -83,7 +88,7 @@ export function IndicioForm({
         descripcion: data.descripcion.trim(),
         color: data.color?.trim() || undefined,
         tamano: data.tamano?.trim() || undefined,
-        peso: data.peso,
+        peso: pesoNumerico,
         ubicacion: data.ubicacion?.trim() || undefined,
         observaciones: data.observaciones?.trim() || undefined,
       };
@@ -183,7 +188,7 @@ export function IndicioForm({
             className={errors.peso ? "border-red-500" : ""}
           />
           {errors.peso && (
-            <p className="mt-1 text-xs text-red-600">{errors.peso.message as string}</p>
+            <p className="mt-1 text-xs text-red-600">{errors.peso.message}</p>
           )}
         </div>
       </div>
