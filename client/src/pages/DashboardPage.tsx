@@ -69,6 +69,22 @@ export default function DashboardPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card className="border-l-4 border-l-indigo-500">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    📊 Reportes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Informes y estadísticas del sistema
+                  </p>
+                  <Button onClick={() => navigate('/reportes')} className="w-full">
+                    Ver Reportes
+                  </Button>
+                </CardContent>
+              </Card>
             </>
           )}
 

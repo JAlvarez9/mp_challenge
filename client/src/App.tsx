@@ -6,6 +6,7 @@ import UsuarioFormPage from './pages/UsuarioFormPage';
 import ExpedientesPage from './pages/ExpedientesPage';
 import NuevoExpedientePage from './pages/NuevoExpedientePage';
 import DetalleExpedientePage from './pages/DetalleExpedientePage';
+import { ReportesPage } from './pages/ReportesPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import RequireAuth from './components/RequireAuth';
 import { useAuthStore } from './store/authStore';
@@ -73,6 +74,14 @@ function App() {
           element={
             <RequireAuth>
               <DetalleExpedientePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/reportes"
+          element={
+            <RequireAuth>
+              <ReportesPage />
             </RequireAuth>
           }
         />
