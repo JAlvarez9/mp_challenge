@@ -13,8 +13,8 @@ const config: sql.config = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   options: {
-    encrypt: false, // Para desarrollo local
-    trustServerCertificate: true,
+    encrypt: true, // SQL Server 2022 requiere cifrado
+    trustServerCertificate: true, // Aceptar certificados autofirmados
     enableArithAbort: true,
   },
   pool: {

@@ -1,0 +1,33 @@
+# Ignorar node_modules
+node_modules
+npm-debug.log
+
+# Ignorar archivos de entorno local
+.env.local
+.env.development
+
+# Ignorar archivos de test
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+jest.config.js
+coverage
+
+# Ignorar documentación
+*.md
+!README.md
+
+# Ignorar configuración de IDE
+.vscode
+.idea
+
+# Ignorar archivos de git
+.git
+.gitignore
+
+# Ignorar dist (se genera en el build)
+dist
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db

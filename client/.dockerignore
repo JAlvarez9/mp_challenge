@@ -1,0 +1,28 @@
+# Ignorar node_modules
+node_modules
+npm-debug.log
+
+# Ignorar archivos de entorno local
+.env.local
+.env.development
+
+# Ignorar configuración de IDE
+.vscode
+.idea
+
+# Ignorar archivos de git
+.git
+.gitignore
+
+# Ignorar dist antes del build
+dist
+
+# Ignorar documentación y tests
+*.md
+!README.md
+coverage
+.nyc_output
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db

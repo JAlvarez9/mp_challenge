@@ -142,7 +142,18 @@ export class UsuarioService {
   /**
    * Alias para desactivar (mantener compatibilidad)
    */
-  async eliminar(id: string, usuarioActual: string): Promise<void> {
+  async inactivar(id: string, usuarioActual: string): Promise<void> {
     await this.desactivar(id, usuarioActual);
+  }
+
+  /**
+   * Activar un usuario
+   * Para reactivar un usuario necesitarías un stored procedure específico
+   * Por ahora lanzamos error indicando que no está implementado
+   */
+  async activar(id: string, usuarioActual: string): Promise<void> {
+    throw new Error(
+      "La funcionalidad de activar usuario requiere un stored procedure adicional (sp_activar_usuario)"
+    );
   }
 }

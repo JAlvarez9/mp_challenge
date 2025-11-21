@@ -1,0 +1,83 @@
+services:
+  # Base de datos SQL Server
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mp_database
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./server/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - mp_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1' -C || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Backend (Node.js/Express)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: mp_backend
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=database
+      - DB_PORT=1433
+      - DB_USERNAME=sa
+      - DB_PASSWORD=YourStrong!Passw0rd
+      - DB_DATABASE=ExpedientesDB
+      - JWT_SECRET=tu_clave_secreta_muy_segura_aqui
+      - JWT_EXPIRES_IN=24h
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - mp_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend (React/Vite con Nginx)
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: mp_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - mp_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# Volumen persistente para la base de datos
+volumes:
+  mssql_data:
+    driver: local
+
+# Red privada para comunicación entre servicios
+networks:
+  mp_network:
+    driver: bridge
